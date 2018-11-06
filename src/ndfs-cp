@@ -1,0 +1,39 @@
+#!/usr/bin/env python3
+
+import sys
+import os
+import hashlib
+
+def usage():
+    print("wrong args")
+    print("ndfs cp <filename> <targetpath>")
+
+if __name__ == "__main__":
+    filename = sys.argv[1]
+    targetpath = sys.argv[2]
+    targetfilename = targetpath+"/"+filename
+    if os.path.exists(targetfilename):
+        print("file exists")
+        exit(1)
+    print("will copy", filename, "to", targetpath)
+    if not os.path.exists(targetpath+"/.ndfs"):
+        print(targetpath, "is not ndfs folder")
+        exist(1)
+    blobpath = targetpath+"/.ndfs/blob/"
+    srcsha1 = hashlib.sha1()
+    data = open(filename, "rb").read()
+    srcsha1.update(data)
+    hashnumber = srcsha1.hexdigest()
+    print(filename, hashnumber)
+    lead = hashnumber[:2]
+    try:
+        print("mkdir", blobpath+lead)
+        os.makedirs(blobpath+lead)
+    except:
+        pass
+    blobfilename = blobpath+lead+"/"+hashnumber
+    if os.path.exists(blobfilename):
+        print("blob exists")
+    else:
+        open(blobfilename,"wb").write(data)
+    os.link(blobfilename, targetpath+"/"+filename)
