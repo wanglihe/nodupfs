@@ -8,6 +8,20 @@ def usage():
     print("wrong args")
     print("ndfs cp <filename> <targetpath>")
 
+def freader(filename, size):
+    f = open(filename, "rb")
+    while True:
+        data = f.read(size)
+        if not data:
+            break
+        yield data
+
+def hashfile(filename, hashobj):
+    size = hashobj.block_size
+    for data in freader(filename, size):
+        hashobj.update(data)
+    return hashobj.hexdigest()
+
 if __name__ == "__main__":
     filename = sys.argv[1]
     targetpath = sys.argv[2]
@@ -20,10 +34,7 @@ if __name__ == "__main__":
         print(targetpath, "is not ndfs folder")
         exist(1)
     blobpath = targetpath+"/.ndfs/blob/"
-    srcsha1 = hashlib.sha1()
-    data = open(filename, "rb").read()
-    srcsha1.update(data)
-    hashnumber = srcsha1.hexdigest()
+    hashnumber = hashfile(filename, hashlib.sha1())
     print(filename, hashnumber)
     lead = hashnumber[:2]
     try:
@@ -35,5 +46,7 @@ if __name__ == "__main__":
     if os.path.exists(blobfilename):
         print("blob exists")
     else:
-        open(blobfilename,"wb").write(data)
+        with open(blobfilename,"wb") as f:
+            for data in freader(filename, 4*1024):
+                f.write(data)
     os.link(blobfilename, targetpath+"/"+filename)
