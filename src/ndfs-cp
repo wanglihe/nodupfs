@@ -49,4 +49,5 @@ if __name__ == "__main__":
         with open(blobfilename,"wb") as f:
             for data in freader(filename, 4*1024):
                 f.write(data)
-    os.link(blobfilename, targetpath+"/"+filename)
+    rpath = os.path.relpath(os.path.realpath(blobfilename), os.path.realpath(targetpath))
+    os.symlink(rpath, targetpath+"/"+filename)
