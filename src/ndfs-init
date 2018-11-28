@@ -2,6 +2,7 @@
 
 import sys
 import os
+import time
 
 def usage():
     print("wrong args")
@@ -12,8 +13,9 @@ if __name__ == "__main__":
     print("will init", target)
     try:
         os.makedirs(target+"/.ndfs")
+        log = "{}: init {}".format(time.asctime(), target)
+        open(target+"/.ndfs/ndfs.log","a").write(log)
     except Exception as e:
         print(e)
         exit(1)
     print(target, "has been inited")
-
