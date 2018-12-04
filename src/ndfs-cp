@@ -3,6 +3,7 @@
 import sys
 import os
 import hashlib
+import time
 
 def usage():
     print("wrong args")
@@ -45,9 +46,13 @@ if __name__ == "__main__":
     blobfilename = blobpath+lead+"/"+hashnumber
     if os.path.exists(blobfilename):
         print("blob exists")
+        log = "{}: {} symlink to {}\n".format(time.asctime(), filename, blobfilename)
+        open(targetpath+"/.ndfs/ndfs.log","a").write(log)
     else:
         with open(blobfilename,"wb") as f:
             for data in freader(filename, 4*1024):
                 f.write(data)
+        log = "{}: {} copy to {}\n".format(time.asctime(), filename, blobfilename)
+        open(targetpath+"/.ndfs/ndfs.log","a").write(log)
     rpath = os.path.relpath(os.path.realpath(blobfilename), os.path.realpath(targetpath))
     os.symlink(rpath, targetpath+"/"+filename)
