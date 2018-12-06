@@ -3,6 +3,13 @@
 import sys
 import os
 import time
+import logging
+
+FORMAT = "%(asctime)s: %(message)s"
+logging.basicConfig(format=FORMAT)
+formatter = logging.Formatter(fmt=FORMAT)
+logger = logging.getLogger()
+logger.setLevel(logging.NOTSET)
 
 def usage():
     print("wrong args")
@@ -13,8 +20,12 @@ if __name__ == "__main__":
     print("will init", target)
     try:
         os.makedirs(target+"/.ndfs")
-        log = "{}: init {}\n".format(time.asctime(), target)
-        open(target+"/.ndfs/ndfs.log","a").write(log)
+        logfile = logging.FileHandler(target+"/.ndfs/ndfs.log")
+        logfile.setFormatter(formatter)
+        logger.addHandler(logfile)
+        logger.info("init %s", target)
+        #log = "{}: init {}\n".format(time.asctime(), target)
+        #open(target+"/.ndfs/ndfs.log","a").write(log)
     except Exception as e:
         print(e)
         exit(1)
